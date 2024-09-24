@@ -1,0 +1,24 @@
+---
+- name: Install additional packages
+  apt:
+    name: '{{ packages }}'
+    state: latest
+    update_cache: yes
+
+- name: Add docker key
+  apt_key:
+    url: https://download.docker.com/linux/debian/gpg
+    state: present
+
+- name: Add docker repo
+  apt_repository:
+    repo: 'deb [arch=amd64] https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable'
+    filename: docker
+    update_cache: yes
+
+- name: Install docker
+  apt:
+    name: docker-ce
+    state: latest
+    update_cache: yes
+  notify: Restart docker

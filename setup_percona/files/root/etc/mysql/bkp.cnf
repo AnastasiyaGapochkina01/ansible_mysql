@@ -1,0 +1,6 @@
+# Automatically generated for Debian scripts. DO NOT TOUCH!
+[client]
+host     = localhost
+user     = backuper
+password = PaSsWoRd 
+socket   = /var/run/mysqld/mysqld.sock

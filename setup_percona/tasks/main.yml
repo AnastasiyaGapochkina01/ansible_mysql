@@ -1,0 +1,52 @@
+---
+# tasks file for setup_percona
+- name: Gathering facts
+  setup:
+
+- name: Install a percona-release.deb package.
+  apt:
+    deb: https://repo.percona.com/apt/percona-release_latest.{{ ansible_distribution_release }}_all.deb
+
+- name: Set percona-release
+  command: percona-release enable ps-57 testing
+
+- name: Install percona-server-server
+  apt:
+    name: percona-server-server-5.7
+    update_cache: yes
+
+- name: Copy mysql configs
+  copy:
+    src: "root/"
+    dest: "/"
+    force: yes
+
+- name: Generate random pass for backuper
+  shell: < /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-16};echo;
+  register: dsm_pass
+
+- name: Set pass in /etc/mysql/debian.cnf
+  shell: sed -i "s/PaSsWoRd/{{dsm_pass.stdout}}/" /etc/mysql/bkp.cnf
+
+- name: Create backuper@localhost mysql user
+  shell: mysql -uroot -e "CREATE USER 'backuper'@'localhost' IDENTIFIED BY '{{dsm_pass.stdout}}';"
+
+- name: Grant backuper@localhost privileges
+  shell: mysql -e "GRANT ALL PRIVILEGES ON *.* TO 'backuper'@'localhost' WITH GRANT OPTION; FLUSH PRIVILEGES"
+
+- name: Install percona-toolkit
+  apt:
+    name: percona-toolkit
+    update_cache: yes
+
+- name: Copy scripts
+  copy:
+    src: scripts/
+    dest: /opt/scripts/
+
+- name: Change script perm
+  file:
+    dest: /opt/scripts/db_backup.sh
+    mode: a+x
+
+
