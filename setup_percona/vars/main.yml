@@ -1,2 +1,5 @@
 ---
 # vars file for setup_percona
+packages:
+  - python3
+  - python3-pip

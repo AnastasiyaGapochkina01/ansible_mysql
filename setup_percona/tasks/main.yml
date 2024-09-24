@@ -49,4 +49,14 @@
     dest: /opt/scripts/db_backup.sh
     mode: a+x
 
+- name: Install requirements
+  apt:
+    name: "{{ packages }}"
+    state: present
+
+- name: Install s3cmd
+  pip:
+    executable: pip3
+    name: s3cmd
+    state: present
 
